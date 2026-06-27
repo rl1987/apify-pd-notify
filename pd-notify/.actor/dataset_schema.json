@@ -7,6 +7,7 @@
             "transformation": {
                 "fields": [
                     "success",
+                    "skipped",
                     "linesSent",
                     "bulk",
                     "providers",
@@ -23,6 +24,10 @@
                 "properties": {
                     "success": {
                         "label": "Success",
+                        "format": "boolean"
+                    },
+                    "skipped": {
+                        "label": "Skipped (empty)",
                         "format": "boolean"
                     },
                     "linesSent": {

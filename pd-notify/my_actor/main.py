@@ -193,13 +193,32 @@ async def main() -> None:
 
         actor_input = await Actor.get_input() or {}
 
-        provider_config = _build_provider_config(actor_input)
-
         lines = await _collect_lines(actor_input)
         if not lines:
-            raise ValueError(
-                'No input to send. Provide `data` text and/or a `sourceDatasetId` with items.'
-            )
+            # Empty input is a valid no-op: in a pipeline, an upstream Actor may
+            # legitimately produce nothing on a given cycle. Record a skipped run
+            # and exit successfully instead of failing the chain.
+            Actor.log.warning('No input to send; nothing to notify. Exiting successfully (no-op).')
+            now = _now_iso()
+            await Actor.push_data({
+                'success': True,
+                'skipped': True,
+                'exitCode': 0,
+                'linesSent': 0,
+                'bulk': bool(actor_input.get('bulk')),
+                'providers': actor_input.get('providers') or [],
+                'ids': actor_input.get('ids') or [],
+                'charLimit': actor_input.get('charLimit'),
+                'delay': actor_input.get('delay'),
+                'rateLimit': actor_input.get('rateLimit'),
+                'startedAt': now,
+                'finishedAt': now,
+                'stdout': '',
+                'stderr': '',
+            })
+            return
+
+        provider_config = _build_provider_config(actor_input)
 
         Actor.log.info('Prepared %d line(s) to notify', len(lines))
 
@@ -250,6 +269,7 @@ async def main() -> None:
 
         await Actor.push_data({
             'success': success,
+            'skipped': False,
             'exitCode': exit_code,
             'linesSent': len(lines),
             'bulk': bool(actor_input.get('bulk')),
