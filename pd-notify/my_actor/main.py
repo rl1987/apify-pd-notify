@@ -310,4 +310,14 @@ async def main() -> None:
                 )
             raise RuntimeError(f'notify exited with code {exit_code}. See stderr in the dataset/log.')
 
+        # Pay-per-event: bill one charge per run that successfully delivers at
+        # least one notification. We only reach here after a confirmed send
+        # (empty/no-op and failed runs return/raise above, so they never bill).
+        # The pricing event is `isOneTimeEvent`, so this is capped at one charge
+        # per run even if called again.
+        try:
+            await Actor.charge(event_name='notification-sent')
+        except Exception as exc:  # noqa: BLE001 - never fail a delivered run over billing
+            Actor.log.warning('Could not charge notification-sent event: %s', exc)
+
         Actor.log.info('Notifications sent successfully.')
