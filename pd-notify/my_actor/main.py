@@ -54,14 +54,22 @@ def _build_provider_config(actor_input: dict) -> str:
     else:
         config = {}
 
-    slack_url = actor_input.get('slackWebhookUrl')
+    # Credentials pasted into the Console often carry a stray leading/trailing
+    # space or newline; that silently breaks auth (e.g. Telegram returns
+    # "Unauthorized" for a token with a trailing newline). Strip them.
+    def _clean(key: str) -> str | None:
+        value = actor_input.get(key)
+        return value.strip() if isinstance(value, str) and value.strip() else None
+
+    slack_url = _clean('slackWebhookUrl')
     if slack_url:
         entry = {'id': 'slack', 'slack_format': '{{data}}', 'slack_webhook_url': slack_url}
-        if actor_input.get('slackChannel'):
-            entry['slack_channel'] = actor_input['slackChannel']
+        slack_channel = _clean('slackChannel')
+        if slack_channel:
+            entry['slack_channel'] = slack_channel
         _append_provider(config, 'slack', entry)
 
-    discord_url = actor_input.get('discordWebhookUrl')
+    discord_url = _clean('discordWebhookUrl')
     if discord_url:
         _append_provider(config, 'discord', {
             'id': 'discord',
@@ -69,8 +77,8 @@ def _build_provider_config(actor_input: dict) -> str:
             'discord_webhook_url': discord_url,
         })
 
-    telegram_key = actor_input.get('telegramApiKey')
-    telegram_chat = actor_input.get('telegramChatId')
+    telegram_key = _clean('telegramApiKey')
+    telegram_chat = _clean('telegramChatId')
     if telegram_key or telegram_chat:
         if not (telegram_key and telegram_chat):
             raise ValueError('Both `telegramApiKey` and `telegramChatId` are required to use Telegram.')
@@ -259,7 +267,17 @@ async def main() -> None:
         stdout = stdout_b.decode('utf-8', errors='replace').strip()
         stderr = stderr_b.decode('utf-8', errors='replace').strip()
         exit_code = proc.returncode or 0
-        success = exit_code == 0
+
+        # notify exits 0 even when a provider send fails (e.g. a bad Telegram
+        # token logs "[ERR] failed to send ... : Unauthorized" but the process
+        # still returns 0). Scan the output for error markers so we don't report
+        # a false success when a notification was not actually delivered.
+        send_errors = [
+            ln.strip()
+            for ln in f'{stdout}\n{stderr}'.splitlines()
+            if '[ERR]' in ln or '[FTL]' in ln
+        ]
+        success = exit_code == 0 and not send_errors
 
         if stdout:
             Actor.log.info('notify stdout:\n%s', stdout)
@@ -270,6 +288,7 @@ async def main() -> None:
         await Actor.push_data({
             'success': success,
             'skipped': False,
+            'sendErrors': send_errors,
             'exitCode': exit_code,
             'linesSent': len(lines),
             'bulk': bool(actor_input.get('bulk')),
@@ -285,6 +304,10 @@ async def main() -> None:
         })
 
         if not success:
+            if send_errors:
+                raise RuntimeError(
+                    f'notify reported {len(send_errors)} delivery error(s): ' + ' | '.join(send_errors)
+                )
             raise RuntimeError(f'notify exited with code {exit_code}. See stderr in the dataset/log.')
 
         Actor.log.info('Notifications sent successfully.')

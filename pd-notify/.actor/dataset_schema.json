@@ -13,6 +13,7 @@
                     "providers",
                     "ids",
                     "exitCode",
+                    "sendErrors",
                     "startedAt",
                     "finishedAt",
                     "stdout",
@@ -49,6 +50,10 @@
                     "exitCode": {
                         "label": "Exit code",
                         "format": "number"
+                    },
+                    "sendErrors": {
+                        "label": "Send errors",
+                        "format": "array"
                     },
                     "startedAt": {
                         "label": "Started at",
