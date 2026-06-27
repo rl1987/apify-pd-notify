@@ -1,0 +1,68 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Notification run summary",
+            "transformation": {
+                "fields": [
+                    "success",
+                    "linesSent",
+                    "bulk",
+                    "providers",
+                    "ids",
+                    "exitCode",
+                    "startedAt",
+                    "finishedAt",
+                    "stdout",
+                    "stderr"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "success": {
+                        "label": "Success",
+                        "format": "boolean"
+                    },
+                    "linesSent": {
+                        "label": "Lines",
+                        "format": "number"
+                    },
+                    "bulk": {
+                        "label": "Bulk",
+                        "format": "boolean"
+                    },
+                    "providers": {
+                        "label": "Providers",
+                        "format": "array"
+                    },
+                    "ids": {
+                        "label": "IDs",
+                        "format": "array"
+                    },
+                    "exitCode": {
+                        "label": "Exit code",
+                        "format": "number"
+                    },
+                    "startedAt": {
+                        "label": "Started at",
+                        "format": "date"
+                    },
+                    "finishedAt": {
+                        "label": "Finished at",
+                        "format": "date"
+                    },
+                    "stdout": {
+                        "label": "Output",
+                        "format": "text"
+                    },
+                    "stderr": {
+                        "label": "Errors",
+                        "format": "text"
+                    }
+                }
+            }
+        }
+    }
+}

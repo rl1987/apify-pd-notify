@@ -1,0 +1,140 @@
+{
+    "title": "ProjectDiscovery Notify",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "data": {
+            "title": "Text to send",
+            "type": "string",
+            "description": "Raw text to send as a notification. Each line becomes a separate notification unless bulk mode is enabled. Leave empty if you read input from a source dataset instead.",
+            "editor": "textarea",
+            "prefill": "Hello from the ProjectDiscovery Notify Actor!"
+        },
+        "sourceDatasetId": {
+            "title": "Source dataset ID",
+            "type": "string",
+            "description": "ID of an Apify dataset to read input from (e.g. the output of a previous Actor in your pipeline). Each item is turned into one line of notification text. Combined with the `Text to send` field if both are provided.",
+            "editor": "textfield"
+        },
+        "datasetFields": {
+            "title": "Dataset fields",
+            "type": "array",
+            "description": "Which fields to extract from each source dataset item. When empty, the whole item is serialized to compact JSON. Multiple fields are joined with the field separator.",
+            "editor": "stringList",
+            "default": []
+        },
+        "datasetFieldSeparator": {
+            "title": "Dataset field separator",
+            "type": "string",
+            "description": "String used to join multiple dataset fields into a single line.",
+            "editor": "textfield",
+            "default": " | "
+        },
+        "slackWebhookUrl": {
+            "title": "Slack webhook URL",
+            "type": "string",
+            "description": "Incoming webhook URL for a Slack channel. When set, a Slack provider (id `slack`) is added automatically.",
+            "editor": "textfield",
+            "isSecret": true,
+            "sectionCaption": "Providers (quick setup)",
+            "sectionDescription": "Fill in any of these to configure common providers without writing YAML. For anything else (Email, Teams, Google Chat, Pushover, Gotify, custom webhooks, multiple entries), use the Advanced provider config below. Both are merged together."
+        },
+        "slackChannel": {
+            "title": "Slack channel",
+            "type": "string",
+            "description": "Optional channel name to post to (e.g. recon). Only used when a Slack webhook URL is set.",
+            "editor": "textfield"
+        },
+        "discordWebhookUrl": {
+            "title": "Discord webhook URL",
+            "type": "string",
+            "description": "Webhook URL for a Discord channel. When set, a Discord provider (id `discord`) is added automatically.",
+            "editor": "textfield",
+            "isSecret": true
+        },
+        "telegramApiKey": {
+            "title": "Telegram bot API key",
+            "type": "string",
+            "description": "Telegram bot token. When set together with a chat ID, a Telegram provider (id `telegram`) is added automatically.",
+            "editor": "textfield",
+            "isSecret": true
+        },
+        "telegramChatId": {
+            "title": "Telegram chat ID",
+            "type": "string",
+            "description": "Telegram chat ID to send messages to. Required when a Telegram bot API key is set.",
+            "editor": "textfield"
+        },
+        "providerConfigYaml": {
+            "title": "Advanced provider config (YAML)",
+            "type": "string",
+            "description": "Contents of the notify provider-config.yaml, defining any provider(s), webhooks and credentials. Merged with the quick-setup fields above. See https://github.com/projectdiscovery/notify#provider-config for the format. Treated as a secret.",
+            "editor": "textarea",
+            "isSecret": true,
+            "sectionCaption": "Advanced provider config",
+            "sectionDescription": "Use this to configure any provider supported by notify, or multiple entries per provider. Entries here are merged with the quick-setup fields above."
+        },
+        "providers": {
+            "title": "Providers",
+            "type": "array",
+            "description": "Restrict sending to these provider types only (e.g. slack, discord, telegram). Maps to the notify `-provider` flag. Empty = all providers in the config.",
+            "editor": "stringList",
+            "default": [],
+            "sectionCaption": "Sending options",
+            "sectionDescription": "Control how and where notifications are sent."
+        },
+        "ids": {
+            "title": "Provider IDs",
+            "type": "array",
+            "description": "Restrict sending to provider entries with these `id` values (e.g. recon, vulns). Maps to the notify `-id` flag. Empty = all IDs.",
+            "editor": "stringList",
+            "default": []
+        },
+        "bulk": {
+            "title": "Bulk mode",
+            "type": "boolean",
+            "description": "Send the whole input as one (chunked) message instead of one notification per line. Maps to the notify `-bulk` flag.",
+            "default": false
+        },
+        "charLimit": {
+            "title": "Character limit",
+            "type": "integer",
+            "description": "Maximum number of characters per message. Maps to the notify `-char-limit` flag.",
+            "default": 4000,
+            "minimum": 1
+        },
+        "delay": {
+            "title": "Delay (seconds)",
+            "type": "integer",
+            "description": "Delay in seconds between each notification. Maps to the notify `-delay` flag.",
+            "default": 0,
+            "minimum": 0
+        },
+        "rateLimit": {
+            "title": "Rate limit (req/s)",
+            "type": "integer",
+            "description": "Maximum number of HTTP requests to send per second. Maps to the notify `-rate-limit` flag. 0 = use notify default.",
+            "default": 0,
+            "minimum": 0
+        },
+        "msgFormat": {
+            "title": "Message format",
+            "type": "string",
+            "description": "Custom message formatting template. Use {{data}} as the placeholder for the line content, e.g. `Alert: {{data}}`. Maps to the notify `-msg-format` flag.",
+            "editor": "textfield"
+        },
+        "proxy": {
+            "title": "Proxy",
+            "type": "string",
+            "description": "HTTP/SOCKSv5 proxy to route notifications through, e.g. http://127.0.0.1:8080. Maps to the notify `-proxy` flag.",
+            "editor": "textfield"
+        },
+        "verbose": {
+            "title": "Verbose output",
+            "type": "boolean",
+            "description": "Enable verbose logging from notify. Maps to the notify `-verbose` flag.",
+            "default": false
+        }
+    },
+    "required": []
+}

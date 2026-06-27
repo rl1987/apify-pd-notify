@@ -2,13 +2,17 @@
 	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
 	"actorSpecification": 1,
 	"name": "pd-notify",
-	"title": "Empty Python project",
-	"description": "Empty project in Python.",
-	"version": "0.0",
+	"title": "ProjectDiscovery Notify",
+	"description": "Stream text or dataset records to Slack, Discord, Telegram, Email and other platforms using the ProjectDiscovery notify CLI.",
+	"version": "1.0",
 	"buildTag": "latest",
 	"meta": {
 		"templateId": "python-empty",
-		"generatedBy": "<FILL-IN-MODEL>"
+		"generatedBy": "Claude Code with Claude Opus 4.8"
 	},
-	"dockerfile": "../Dockerfile"
+	"dockerfile": "../Dockerfile",
+	"input": "./input_schema.json",
+	"storages": {
+		"dataset": "./dataset_schema.json"
+	}
 }

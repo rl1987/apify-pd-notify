@@ -1,7 +1,18 @@
 # First, specify the base Docker image.
 # You can see the Docker images from Apify at https://hub.docker.com/r/apify/.
-# You can also use any other image from Docker Hub.
 FROM apify/actor-python:3.14
+
+# Install the ProjectDiscovery `notify` CLI binary into the image.
+# We download the prebuilt release artifact (linux/amd64) and place it on PATH.
+# Done as root, then we switch back to the unprivileged `myuser`.
+USER root
+ARG NOTIFY_VERSION=1.0.7
+RUN curl -sSfL -o /tmp/notify.zip \
+      "https://github.com/projectdiscovery/notify/releases/download/v${NOTIFY_VERSION}/notify_${NOTIFY_VERSION}_linux_amd64.zip" \
+ && python -m zipfile -e /tmp/notify.zip /tmp/notify-extract \
+ && install -m 0755 /tmp/notify-extract/notify /usr/local/bin/notify \
+ && rm -rf /tmp/notify.zip /tmp/notify-extract \
+ && notify -version -duc
 
 USER myuser
 
