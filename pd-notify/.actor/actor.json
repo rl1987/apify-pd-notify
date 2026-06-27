@@ -11,6 +11,8 @@
 		"generatedBy": "Claude Code with Claude Opus 4.8"
 	},
 	"dockerfile": "../Dockerfile",
+	"minMemoryMbytes": 256,
+	"maxMemoryMbytes": 512,
 	"input": "./input_schema.json",
 	"storages": {
 		"dataset": "./dataset_schema.json"
