@@ -7,8 +7,7 @@
             "title": "Text to send",
             "type": "string",
             "description": "Raw text to send as a notification. Each line becomes a separate notification unless bulk mode is enabled. Leave empty if you read input from a source dataset instead.",
-            "editor": "textarea",
-            "prefill": "Hello from the ProjectDiscovery Notify Actor!"
+            "editor": "textarea"
         },
         "sourceDatasetId": {
             "title": "Source dataset ID",
